@@ -10,7 +10,7 @@ pipeline {
                 }
             }
             steps {
-                dir('.') {
+                dir('dummy-app') {
                     sh 'mvn clean package'
                 }
             }
@@ -18,7 +18,9 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t dummy-app:java17 .'
+                dir('dummy-app') {
+                    sh 'docker build -t dummy-app:java17 .'
+                }
             }
         }
     }
