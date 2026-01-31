@@ -10,7 +10,9 @@ pipeline {
                 }
             }
             steps {
-                sh 'mvn clean package'
+                dir('.') {
+                    sh 'mvn clean package'
+                }
             }
         }
 
