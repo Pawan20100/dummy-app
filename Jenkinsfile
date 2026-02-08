@@ -1,46 +1,35 @@
 pipeline {
-  agent any
+    agent none
 
-  environment {
-    IMAGE = "codekar/dummy-app:${BUILD_NUMBER}"
-  }
-
-  stages {
-
-    stage('Build Jar') {
-      steps {
-        sh 'mvn clean package'
-      }
+    environment {
+        IMAGE = "codekar/dummy-app:${BUILD_NUMBER}"
     }
 
-    stage('Build Image') {
-      steps {
-        sh 'docker build -t $IMAGE .'
-      }
-    }
+    stages {
 
-    stage('Push Image') {
-      steps {
-        withCredentials([usernamePassword(
-          credentialsId: 'dockerhub-creds',
-          usernameVariable: 'codekar',
-          passwordVariable: 'DOCKER@Codekar'
-        )]) {
-          sh '''
-          echo $PASS | docker login -u $USER --password-stdin
-          docker push $IMAGE
-          '''
+        stage('Checkout') {
+            agent any
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Deploy to Kubernetes') {
-      steps {
-        sh '''
-        kubectl set image deployment/dummy-app \
-        dummy-app=$IMAGE
-        '''
-      }
+        stage('Build Jar') {
+            agent {
+                docker {
+                    image 'maven:3.9.9-eclipse-temurin-17'
+                }
+            }
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Image') {
+            agent any
+            steps {
+                sh 'docker build -t $IMAGE .'
+            }
+        }
     }
-  }
 }
