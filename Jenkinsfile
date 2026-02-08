@@ -47,7 +47,11 @@ pipeline {
 			}
 		}
 		stage('Test Kubectl') {
-			agent any
+			agent {
+				docker {
+					image 'bitnami/kubectl:latest'
+				}
+			}
 			steps {
 				sh 'kubectl version --client'
 			}
