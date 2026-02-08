@@ -46,7 +46,7 @@ pipeline {
 				}
 			}
 		}
-		stage('Test Kubectl') {
+		stage('Deploy to Kubernetes') {
 			agent {
 				docker {
 					image 'bitnami/kubectl:latest'
@@ -54,7 +54,15 @@ pipeline {
 				}
 			}
 			steps {
-				sh 'kubectl version --client'
+				withCredentials([string(credentialsId: 'kubeconfig', variable: 'KCFG')]) {
+					sh '''
+					mkdir -p $HOME/.kube
+					echo "$KCFG" > $HOME/.kube/config
+					kubectl get nodes
+					kubectl set image deployment/dummy-app \
+						dummy-app=$IMAGE
+					'''
+				}
 			}
 		}
     }
