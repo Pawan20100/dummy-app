@@ -31,7 +31,7 @@ pipeline {
                 sh 'docker build -t $IMAGE .'
             }
         }
-	stage('Push Image') {
+		stage('Push Image') {
 			agent any
 			steps {
 				withCredentials([usernamePassword(
@@ -44,6 +44,12 @@ pipeline {
 					docker push $IMAGE
 					'''
 				}
+			}
+		}
+		stage('Test Kubectl') {
+			agent any
+			steps {
+				sh 'kubectl version --client'
 			}
 		}
     }
