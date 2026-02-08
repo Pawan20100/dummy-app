@@ -54,10 +54,10 @@ pipeline {
 				}
 			}
 			steps {
-				withCredentials([string(credentialsId: 'kubeconfig', variable: 'KCFG')]) {
+				withCredentials([file(credentialsId: 'kubeconfig', variable: 'KCFG')]) {
 					sh '''
 					mkdir -p $HOME/.kube
-					echo "$KCFG" > $HOME/.kube/config
+					cp $KCFG $HOME/.kube/config
 					kubectl get nodes
 					kubectl set image deployment/dummy-app \
 						dummy-app=$IMAGE
