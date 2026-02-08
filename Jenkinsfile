@@ -31,5 +31,20 @@ pipeline {
                 sh 'docker build -t $IMAGE .'
             }
         }
+		stage('Push Image') {
+			agent any
+			steps {
+				withCredentials([usernamePassword(
+					credentialsId: 'dockerhub-creds',
+					usernameVariable: 'codekar',
+					passwordVariable: 'DOCKER@Codekar'
+				)]) {
+					sh '''
+					echo $DOCKER_PASS | docker login -u $codekar --password-stdin
+					docker push $IMAGE
+					'''
+				}
+			}
+		}
     }
 }
